@@ -1,0 +1,21 @@
+<Window x:Class="ScreenRecorder.Desktop.Views.RegionSelectorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="#55000000"
+        Topmost="True"
+        ShowInTaskbar="False"
+        WindowState="Maximized"
+        Cursor="Cross">
+    <Canvas x:Name="RootCanvas"
+            MouseLeftButtonDown="RootCanvas_MouseLeftButtonDown"
+            MouseMove="RootCanvas_MouseMove"
+            MouseLeftButtonUp="RootCanvas_MouseLeftButtonUp">
+        <Rectangle x:Name="SelectionRectangle"
+                   Stroke="#00FF88"
+                   StrokeThickness="2"
+                   StrokeDashArray="6,3"
+                   Visibility="Collapsed" />
+    </Canvas>
+</Window>

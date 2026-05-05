@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "dgSpecHash": "bhiH+B/eHx8=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\mozza\\Screen_Recorder\\ScreenRecorder.Desktop\\ScreenRecorder.Desktop.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\mozza\\.nuget\\packages\\microsoft.windows.cswin32\\0.3.275\\microsoft.windows.cswin32.0.3.275.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\microsoft.windows.sdk.win32docs\\0.1.42-alpha\\microsoft.windows.sdk.win32docs.0.1.42-alpha.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\microsoft.windows.sdk.win32metadata\\70.0.11-preview\\microsoft.windows.sdk.win32metadata.70.0.11-preview.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\microsoft.windows.wdk.win32metadata\\0.13.25-experimental\\microsoft.windows.wdk.win32metadata.0.13.25-experimental.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\naudio\\2.3.0\\naudio.2.3.0.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\naudio.asio\\2.3.0\\naudio.asio.2.3.0.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\naudio.core\\2.3.0\\naudio.core.2.3.0.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\naudio.midi\\2.3.0\\naudio.midi.2.3.0.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\naudio.wasapi\\2.3.0\\naudio.wasapi.2.3.0.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\naudio.winforms\\2.3.0\\naudio.winforms.2.3.0.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\naudio.winmm\\2.3.0\\naudio.winmm.2.3.0.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\sharpavi\\2.2.1\\sharpavi.2.2.1.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\sharpgen.runtime\\2.4.2-beta\\sharpgen.runtime.2.4.2-beta.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\sharpgen.runtime.com\\2.4.2-beta\\sharpgen.runtime.com.2.4.2-beta.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\system.io.pipelines\\9.0.1\\system.io.pipelines.9.0.1.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\system.text.encodings.web\\9.0.1\\system.text.encodings.web.9.0.1.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\system.text.json\\9.0.1\\system.text.json.9.0.1.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\vortice.direct3d11\\3.8.3\\vortice.direct3d11.3.8.3.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\vortice.directx\\3.8.3\\vortice.directx.3.8.3.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\vortice.dxgi\\3.8.3\\vortice.dxgi.3.8.3.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\vortice.mathematics\\2.1.0\\vortice.mathematics.2.1.0.nupkg.sha512",
+    "C:\\Users\\mozza\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.19041.56\\microsoft.windows.sdk.net.ref.10.0.19041.56.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'SharpAvi 2.2.1' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0-windows10.0.19041'. This package may not be fully compatible with your project.",
+      "libraryId": "SharpAvi",
+      "targetGraphs": [
+        "net8.0-windows10.0.19041"
+      ]
+    }
+  ]
+}

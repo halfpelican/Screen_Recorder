@@ -1,0 +1,106 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\mozza\\Screen_Recorder\\ScreenRecorder.Desktop\\ScreenRecorder.Desktop.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\mozza\\Screen_Recorder\\ScreenRecorder.Desktop\\ScreenRecorder.Desktop.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\mozza\\Screen_Recorder\\ScreenRecorder.Desktop\\ScreenRecorder.Desktop.csproj",
+        "projectName": "ScreenRecorder.Desktop",
+        "projectPath": "C:\\Users\\mozza\\Screen_Recorder\\ScreenRecorder.Desktop\\ScreenRecorder.Desktop.csproj",
+        "packagesPath": "C:\\Users\\mozza\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\mozza\\Screen_Recorder\\ScreenRecorder.Desktop\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\mozza\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0-windows10.0.19041.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0-windows10.0.19041": {
+            "targetAlias": "net8.0-windows10.0.19041.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0-windows10.0.19041": {
+          "targetAlias": "net8.0-windows10.0.19041.0",
+          "dependencies": {
+            "Microsoft.Windows.CsWin32": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.3.275, )"
+            },
+            "Microsoft.Windows.SDK.Win32Metadata": {
+              "target": "Package",
+              "version": "[70.0.11-preview, )"
+            },
+            "NAudio": {
+              "target": "Package",
+              "version": "[2.3.0, )"
+            },
+            "SharpAvi": {
+              "target": "Package",
+              "version": "[2.*, )"
+            },
+            "Vortice.DXGI": {
+              "target": "Package",
+              "version": "[3.*, )"
+            },
+            "Vortice.Direct3D11": {
+              "target": "Package",
+              "version": "[3.*, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.Windows.SDK.NET.Ref",
+              "version": "[10.0.19041.56, 10.0.19041.56]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.Windows.SDK.NET.Ref": {
+              "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WPF": {
+              "privateAssets": "none"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.420/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
