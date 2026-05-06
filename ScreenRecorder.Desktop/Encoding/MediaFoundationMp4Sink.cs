@@ -73,7 +73,19 @@ public sealed class MediaFoundationMp4Sink : IRecordingSink
 
             try
             {
-                CheckHr(MF.MFCreateSinkWriterFromURL(outputPath, IntPtr.Zero, null, out _sinkWriter), "MFCreateSinkWriterFromURL");
+                // Enable transform chaining (colour converter → H.264 encoder).
+                // Passing null here disables it and causes MF_E_INVALIDMEDIATYPE (0xC00D36B4)
+                // because the writer cannot bridge RGB32 → H.264 without inserting transforms.
+                CheckHr(MF.MFCreateAttributes(out var writerAttrs, 1), "MFCreateAttributes(writer)");
+                try
+                {
+                    CheckHr(writerAttrs.SetUINT32(MF.MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, 1), "Set hardware transforms");
+                    CheckHr(MF.MFCreateSinkWriterFromURL(outputPath, IntPtr.Zero, writerAttrs, out _sinkWriter), "MFCreateSinkWriterFromURL");
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(writerAttrs);
+                }
                 ConfigureVideoStream();
                 if (audioFormat is not null)
                 {
@@ -257,18 +269,17 @@ public sealed class MediaFoundationMp4Sink : IRecordingSink
             CheckHr(MF.MFSetAttributeRatio(outputType, MF.MF_MT_PIXEL_ASPECT_RATIO, 1, 1), "Set pixel aspect ratio");
             CheckHr(_sinkWriter!.AddStream(outputType, out _videoStreamIndex), "IMFSinkWriter.AddStream(video)");
 
+            // Minimum set of attributes needed for the sink writer to resolve the
+            // RGB32 → colour-converter → H.264 transform chain.
+            // Adding FRAME_RATE, PIXEL_ASPECT_RATIO, or INTERLACE_MODE to the *input*
+            // type causes the chain resolver to fail with MF_E_INVALIDMEDIATYPE because
+            // the colour-converter DMO's output caps don't replicate those attributes,
+            // breaking the negotiation between the converter and the H.264 encoder.
             CheckHr(MF.MFCreateMediaType(out inputType), "MFCreateMediaType(video input)");
             CheckHr(inputType.SetGUID(MF.MF_MT_MAJOR_TYPE, MF.MFMediaType_Video), "Set video input major");
             CheckHr(inputType.SetGUID(MF.MF_MT_SUBTYPE, MF.MFVideoFormat_RGB32), "Set video input subtype");
-            CheckHr(inputType.SetUINT32(MF.MF_MT_INTERLACE_MODE, MfVideoInterlaceProgressive), "Set video input interlace");
             CheckHr(MF.MFSetAttributeSize(inputType, MF.MF_MT_FRAME_SIZE, (uint)_width, (uint)_height), "Set input frame size");
-            CheckHr(MF.MFSetAttributeRatio(inputType, MF.MF_MT_FRAME_RATE, (uint)_fps, 1), "Set input frame rate");
-            CheckHr(MF.MFSetAttributeRatio(inputType, MF.MF_MT_PIXEL_ASPECT_RATIO, 1, 1), "Set input pixel aspect ratio");
-            // Stride must be negative for top-down bitmaps (GDI+ / WGC are always top-down).
-            // A positive value tells MF the data is bottom-up, which causes MF_E_INVALIDMEDIATYPE.
-            // MF_MT_FIXED_SIZE_SAMPLES / MF_MT_SAMPLE_SIZE / MF_MT_ALL_SAMPLES_INDEPENDENT are
-            // output-type attributes and must NOT be set on the input type — doing so causes the
-            // sink writer to reject the converter chain with 0xC00D36B4.
+            // Negative stride = top-down layout (GDI+ and WGC frames are always top-down).
             CheckHr(inputType.SetUINT32(MF.MF_MT_DEFAULT_STRIDE, -_videoStride), "Set input stride");
             CheckHr(_sinkWriter!.SetInputMediaType(_videoStreamIndex, inputType, null), "Set input media type(video)");
         }

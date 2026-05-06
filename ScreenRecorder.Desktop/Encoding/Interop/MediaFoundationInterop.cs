@@ -35,6 +35,11 @@ namespace ScreenRecorder.Desktop.Encoding.Interop
         public static readonly Guid MF_MT_AUDIO_BITS_PER_SAMPLE = new Guid("f2deb57f-40fa-4764-aa33-ed4f2d1ff669");
         public static readonly Guid MF_MT_AAC_AUDIO_PROFILE_LEVEL_INDICATION = new Guid("7632f0e6-9538-4d61-acda-ea29c8c14456");
 
+        // Sink-writer creation attribute: allows the writer to insert hardware/software
+        // colour-converter and encoder transforms between the input RGB32 and output H.264.
+        // Without this the writer cannot bridge formats and returns MF_E_INVALIDMEDIATYPE.
+        public static readonly Guid MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS = new Guid("A634A91C-822B-41B9-A494-4DE4643612B0");
+
         [DllImport("Mfplat.dll", ExactSpelling = true)]
         public static extern int MFStartup(int version, int dwFlags);
 
