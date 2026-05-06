@@ -63,10 +63,12 @@ public sealed class MediaFoundationMp4Sink : IRecordingSink
             }
 
             OutputPath = outputPath;
-            _width = width;
-            _height = height;
+            // H.264 requires width and height to be divisible by 2.
+            // DPI-scaled screens can produce odd pixel counts, so snap up.
+            _width = width % 2 == 0 ? width : width + 1;
+            _height = height % 2 == 0 ? height : height + 1;
             _fps = fps;
-            _videoStride = checked(width * 4);
+            _videoStride = checked(_width * 4);
             _frameDuration = HnsPerSecond / Math.Max(1, fps);
 
             try
@@ -208,7 +210,9 @@ public sealed class MediaFoundationMp4Sink : IRecordingSink
             {
                 if (_sinkWriter is not null)
                 {
-                    CheckHr(_sinkWriter.Finalize(), "IMFSinkWriter.Finalize");
+                    // Use FinalizeWriter() — Finalize() is reserved by the CLR and was
+                    // renamed in the IMFSinkWriter interface to avoid dispatch issues.
+                    CheckHr(_sinkWriter.FinalizeWriter(), "IMFSinkWriter.Finalize");
                 }
             }
             finally
@@ -260,10 +264,12 @@ public sealed class MediaFoundationMp4Sink : IRecordingSink
             CheckHr(MF.MFSetAttributeSize(inputType, MF.MF_MT_FRAME_SIZE, (uint)_width, (uint)_height), "Set input frame size");
             CheckHr(MF.MFSetAttributeRatio(inputType, MF.MF_MT_FRAME_RATE, (uint)_fps, 1), "Set input frame rate");
             CheckHr(MF.MFSetAttributeRatio(inputType, MF.MF_MT_PIXEL_ASPECT_RATIO, 1, 1), "Set input pixel aspect ratio");
-            CheckHr(inputType.SetUINT32(MF.MF_MT_DEFAULT_STRIDE, _videoStride), "Set input stride");
-            CheckHr(inputType.SetUINT32(MF.MF_MT_FIXED_SIZE_SAMPLES, 1), "Set fixed size samples");
-            CheckHr(inputType.SetUINT32(MF.MF_MT_SAMPLE_SIZE, _videoStride * _height), "Set sample size");
-            CheckHr(inputType.SetUINT32(MF.MF_MT_ALL_SAMPLES_INDEPENDENT, 1), "Set samples independent");
+            // Stride must be negative for top-down bitmaps (GDI+ / WGC are always top-down).
+            // A positive value tells MF the data is bottom-up, which causes MF_E_INVALIDMEDIATYPE.
+            // MF_MT_FIXED_SIZE_SAMPLES / MF_MT_SAMPLE_SIZE / MF_MT_ALL_SAMPLES_INDEPENDENT are
+            // output-type attributes and must NOT be set on the input type — doing so causes the
+            // sink writer to reject the converter chain with 0xC00D36B4.
+            CheckHr(inputType.SetUINT32(MF.MF_MT_DEFAULT_STRIDE, -_videoStride), "Set input stride");
             CheckHr(_sinkWriter!.SetInputMediaType(_videoStreamIndex, inputType, null), "Set input media type(video)");
         }
         finally

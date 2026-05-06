@@ -1,12 +1,21 @@
 using System.Diagnostics;
 using System.Drawing;
-using System.Windows;
+using System.Runtime.InteropServices;
 using ScreenRecorder.Desktop.Models;
 
 namespace ScreenRecorder.Desktop.Capture;
 
 public abstract class BaseThreadedCaptureSource : IScreenCaptureSource
 {
+    // GetSystemMetrics indices for the virtual screen — safe to call from any thread.
+    private const int SM_XVIRTUALSCREEN  = 76;
+    private const int SM_YVIRTUALSCREEN  = 77;
+    private const int SM_CXVIRTUALSCREEN = 78;
+    private const int SM_CYVIRTUALSCREEN = 79;
+
+    [DllImport("user32.dll")]
+    private static extern int GetSystemMetrics(int nIndex);
+
     public abstract string Name { get; }
     public abstract bool IsAvailable { get; }
 
@@ -53,6 +62,11 @@ public abstract class BaseThreadedCaptureSource : IScreenCaptureSource
         }
     }
 
+    /// <summary>
+    /// Resolves the capture area from either the supplied region or the full virtual screen.
+    /// Uses <c>GetSystemMetrics</c> (thread-safe) instead of <c>SystemParameters</c>
+    /// (which requires the WPF dispatcher and crashes when called from a background thread).
+    /// </summary>
     protected static Rectangle ResolveCaptureArea(CaptureRegion? region)
     {
         if (region is { IsValid: true })
@@ -60,10 +74,11 @@ public abstract class BaseThreadedCaptureSource : IScreenCaptureSource
             return new Rectangle(region.Left, region.Top, region.Width, region.Height);
         }
 
-        var left = (int)SystemParameters.VirtualScreenLeft;
-        var top = (int)SystemParameters.VirtualScreenTop;
-        var width = (int)SystemParameters.VirtualScreenWidth;
-        var height = (int)SystemParameters.VirtualScreenHeight;
+        var left   = GetSystemMetrics(SM_XVIRTUALSCREEN);
+        var top    = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        var width  = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+        var height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
         if (width <= 0 || height <= 0)
         {
             throw new InvalidOperationException("No primary display was found.");

@@ -53,11 +53,21 @@ namespace ScreenRecorder.Desktop.Encoding.Interop
         [DllImport("Mfplat.dll", ExactSpelling = true)]
         public static extern int MFCreateAttributes(out IMFAttributes ppMFAttributes, uint cInitialSize);
 
-        [DllImport("Mfplat.dll", ExactSpelling = true)]
-        public static extern int MFSetAttributeSize(IMFAttributes pAttributes, Guid guidKey, uint unWidth, uint unHeight);
+        // MFSetAttributeSize and MFSetAttributeRatio are NOT real Mfplat.dll exports.
+        // They are inline C++ helpers in the Windows SDK headers that pack two uint32
+        // values into a uint64 and forward to IMFAttributes::SetUINT64.
+        // We replicate that logic here rather than P/Invoking a non-existent entry point.
+        public static int MFSetAttributeSize(IMFAttributes pAttributes, Guid guidKey, uint unWidth, uint unHeight)
+        {
+            var packed = ((long)unWidth << 32) | unHeight;
+            return pAttributes.SetUINT64(guidKey, packed);
+        }
 
-        [DllImport("Mfplat.dll", ExactSpelling = true)]
-        public static extern int MFSetAttributeRatio(IMFAttributes pAttributes, Guid guidKey, uint unNumerator, uint unDenominator);
+        public static int MFSetAttributeRatio(IMFAttributes pAttributes, Guid guidKey, uint unNumerator, uint unDenominator)
+        {
+            var packed = ((long)unNumerator << 32) | unDenominator;
+            return pAttributes.SetUINT64(guidKey, packed);
+        }
 
         [DllImport("mfreadwrite.dll", ExactSpelling = true, CharSet = CharSet.Unicode)]
         public static extern int MFCreateSinkWriterFromURL(
@@ -162,7 +172,12 @@ namespace ScreenRecorder.Desktop.Encoding.Interop
         int PlaceMarker(int dwStreamIndex, IntPtr pvContext);
         int NotifyEndOfSegment(int dwStreamIndex);
         int Flush(int dwStreamIndex);
-        int Finalize();
+
+        // Renamed from Finalize() — that name is reserved by the CLR for destructors and
+        // causes undefined COM vtable dispatch behaviour. The vtable slot position is
+        // unchanged so the correct native IMFSinkWriter::Finalize method is still called.
+        int FinalizeWriter();
+
         int GetServiceForStream(int dwStreamIndex, [In] ref Guid guidService, [In] ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out object ppvObject);
         int GetStatistics(int dwStreamIndex, out MF_SINK_WRITER_STATISTICS pStats);
     }
