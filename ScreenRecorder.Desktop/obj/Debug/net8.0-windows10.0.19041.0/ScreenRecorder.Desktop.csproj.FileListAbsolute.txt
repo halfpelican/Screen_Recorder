@@ -42,3 +42,4 @@ C:\Users\mozza\Screen_Recorder\ScreenRecorder.Desktop\bin\Debug\net8.0-windows10
 C:\Users\mozza\Screen_Recorder\ScreenRecorder.Desktop\bin\Debug\net8.0-windows10.0.19041.0\Vortice.DXGI.dll
 C:\Users\mozza\Screen_Recorder\ScreenRecorder.Desktop\bin\Debug\net8.0-windows10.0.19041.0\Vortice.Mathematics.dll
 C:\Users\mozza\Screen_Recorder\ScreenRecorder.Desktop\bin\Debug\net8.0-windows10.0.19041.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
+C:\Users\mozza\Screen_Recorder\ScreenRecorder.Desktop\obj\Debug\net8.0-windows10.0.19041.0\ScreenRecorder.Desktop.sourcelink.json
