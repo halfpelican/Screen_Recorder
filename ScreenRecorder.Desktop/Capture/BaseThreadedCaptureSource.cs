@@ -64,8 +64,7 @@ public abstract class BaseThreadedCaptureSource : IScreenCaptureSource
 
     /// <summary>
     /// Resolves the capture area from either the supplied region or the full virtual screen.
-    /// Uses <c>GetSystemMetrics</c> (thread-safe) instead of <c>SystemParameters</c>
-    /// (which requires the WPF dispatcher and crashes when called from a background thread).
+    /// Uses a thread-safe retrieval for virtual screen bounds.
     /// </summary>
     protected static Rectangle ResolveCaptureArea(CaptureRegion? region)
     {
@@ -74,16 +73,54 @@ public abstract class BaseThreadedCaptureSource : IScreenCaptureSource
             return new Rectangle(region.Left, region.Top, region.Width, region.Height);
         }
 
+        // Try to get virtual screen bounds in a thread-safe way
+        var bounds = TryGetVirtualScreenBounds();
+        if (bounds.Width <= 0 || bounds.Height <= 0)
+        {
+            throw new InvalidOperationException("No primary display was found.");
+        }
+        return bounds;
+    }
+
+    /// <summary>
+    /// Safely retrieves the virtual screen bounds, marshaling to the dispatcher if needed.
+    /// </summary>
+    private static Rectangle TryGetVirtualScreenBounds()
+    {
+#if WINDOWS
+        // If called from a non-UI thread, SystemParameters is not safe. Use GetSystemMetrics.
+        try
+        {
+            if (System.Windows.Application.Current?.Dispatcher?.CheckAccess() == true)
+            {
+                // UI thread: safe to use SystemParameters
+                return new Rectangle(
+                    (int)System.Windows.SystemParameters.VirtualScreenLeft,
+                    (int)System.Windows.SystemParameters.VirtualScreenTop,
+                    (int)System.Windows.SystemParameters.VirtualScreenWidth,
+                    (int)System.Windows.SystemParameters.VirtualScreenHeight);
+            }
+            else if (System.Windows.Application.Current?.Dispatcher != null)
+            {
+                // Not UI thread, but dispatcher available: marshal synchronously
+                return System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    new Rectangle(
+                        (int)System.Windows.SystemParameters.VirtualScreenLeft,
+                        (int)System.Windows.SystemParameters.VirtualScreenTop,
+                        (int)System.Windows.SystemParameters.VirtualScreenWidth,
+                        (int)System.Windows.SystemParameters.VirtualScreenHeight));
+            }
+        }
+        catch
+        {
+            // Fallback to GetSystemMetrics below
+        }
+#endif
+        // Fallback: use GetSystemMetrics (thread-safe, but may not reflect DPI scaling)
         var left   = GetSystemMetrics(SM_XVIRTUALSCREEN);
         var top    = GetSystemMetrics(SM_YVIRTUALSCREEN);
         var width  = GetSystemMetrics(SM_CXVIRTUALSCREEN);
         var height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-
-        if (width <= 0 || height <= 0)
-        {
-            throw new InvalidOperationException("No primary display was found.");
-        }
-
         return new Rectangle(left, top, width, height);
     }
 

@@ -13,6 +13,9 @@ namespace ScreenRecorder.Desktop.Encoding.Interop
         public static readonly Guid MFVideoFormat_H264 = new Guid("34363248-0000-0010-8000-00AA00389B71");
         public static readonly Guid MFAudioFormat_AAC = new Guid("00001610-0000-0010-8000-00AA00389B71");
         public static readonly Guid MFVideoFormat_RGB32 = new Guid("00000016-0000-0010-8000-00AA00389B71");
+        // NV12: planar YUV 4:2:0 — the native input format for all Windows H.264 encoders.
+        // Using NV12 eliminates the colour-converter DMO chain entirely.
+        public static readonly Guid MFVideoFormat_NV12 = new Guid("3231564E-0000-0010-8000-00AA00389B71");
         public static readonly Guid MFAudioFormat_PCM = new Guid("00000001-0000-0010-8000-00AA00389B71");
         public static readonly Guid MFAudioFormat_Float = new Guid("00000003-0000-0010-8000-00AA00389B71");
         public static readonly Guid MFTranscodeContainerType_MP4 = new Guid("E4A3B6C0-5522-4C11-AE8C-D7E8B2EAF7D6");
@@ -62,16 +65,17 @@ namespace ScreenRecorder.Desktop.Encoding.Interop
         // They are inline C++ helpers in the Windows SDK headers that pack two uint32
         // values into a uint64 and forward to IMFAttributes::SetUINT64.
         // We replicate that logic here rather than P/Invoking a non-existent entry point.
+        // Packing must preserve full unsigned 32-bit values in a 64-bit payload.
         public static int MFSetAttributeSize(IMFAttributes pAttributes, Guid guidKey, uint unWidth, uint unHeight)
         {
-            var packed = ((long)unWidth << 32) | unHeight;
-            return pAttributes.SetUINT64(guidKey, packed);
+            ulong packed = ((ulong)unWidth << 32) | (ulong)unHeight;
+            return pAttributes.SetUINT64(guidKey, unchecked((long)packed));
         }
 
         public static int MFSetAttributeRatio(IMFAttributes pAttributes, Guid guidKey, uint unNumerator, uint unDenominator)
         {
-            var packed = ((long)unNumerator << 32) | unDenominator;
-            return pAttributes.SetUINT64(guidKey, packed);
+            ulong packed = ((ulong)unNumerator << 32) | (ulong)unDenominator;
+            return pAttributes.SetUINT64(guidKey, unchecked((long)packed));
         }
 
         [DllImport("mfreadwrite.dll", ExactSpelling = true, CharSet = CharSet.Unicode)]
@@ -178,10 +182,12 @@ namespace ScreenRecorder.Desktop.Encoding.Interop
         int NotifyEndOfSegment(int dwStreamIndex);
         int Flush(int dwStreamIndex);
 
-        // Renamed from Finalize() — that name is reserved by the CLR for destructors and
+        // Aliased from Finalize() — that name is reserved by the CLR for destructors and
         // causes undefined COM vtable dispatch behaviour. The vtable slot position is
         // unchanged so the correct native IMFSinkWriter::Finalize method is still called.
-        int FinalizeWriter();
+        [PreserveSig]
+        int MFInvokeFinalize(); // was Finalize()
+        // For clarity, use MFInvokeFinalize at call sites, but keep vtable order.
 
         int GetServiceForStream(int dwStreamIndex, [In] ref Guid guidService, [In] ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out object ppvObject);
         int GetStatistics(int dwStreamIndex, out MF_SINK_WRITER_STATISTICS pStats);

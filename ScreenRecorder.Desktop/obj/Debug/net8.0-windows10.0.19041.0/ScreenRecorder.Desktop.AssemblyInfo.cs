@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ScreenRecorder.Desktop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+61e01d51fda7e3d5de8a6de68c50766f0e876762")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1a653bb480f8c065942034d55b873b272032a0b5")]
 [assembly: System.Reflection.AssemblyProductAttribute("ScreenRecorder.Desktop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ScreenRecorder.Desktop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
